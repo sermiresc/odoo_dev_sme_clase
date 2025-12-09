@@ -1,5 +1,5 @@
 {
-    'name': "HolaMundo_V3",
+    'name': "gestion_restaurante_sme",
 
     'summary': "Short (1 phrase/line) summary of the module's purpose",
 
@@ -23,13 +23,9 @@ Long description of module's purpose
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
-        #'views/templates.xml',
+        'views/templates.xml',
     ],
-    # only loaded in demonstration mode
-    #'demo': [
-    #    'demo/demo.xml',
-    #],
-    'installable': True,
     'application': True,
+    'installable': True,
 }
 
