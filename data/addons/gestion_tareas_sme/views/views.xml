@@ -1,28 +1,57 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
-
+ <!-- Vista de Lista -->
     <record model="ir.ui.view" id="gestion_tareas_sme.list">
       <field name="name">gestion_tareas_sme list</field>
       <field name="model">gestion_tareas_sme.gestion_tareas_sme</field>
       <field name="arch" type="xml">
         <list>
-          <field name="name"/>
-          <field name="description"/>
+            <field name="nombre"/>
+            <field name="descripcion"/>
+            <field name="fecha_creacion"/>
+            <field name="fecha_ini"/>
+            <field name="fecha_fin"/>
+            <field name="finalizado"/>
+            <field name="sprint"/>
         </list>
       </field>
     </record>
 
+<!-- Vista de Formulario -->
+    <record model="ir.ui.view" id="gestion_tareas_sme.form">
+      <field name="name">gestion_tareas_sme form</field>
+      <field name="model">gestion_tareas_sme.sprints_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="date_ini"/>
+                    <field name="date_fin"/>
+                    <field name="tasks"/>
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
 
-    <!-- actions opening views on models -->
+   <!-- actions opening views on models -->
 
-    <record model="ir.actions.act_window" id="gestion_tareas_sme.action_window">
-      <field name="name">gestion_tareas_sme window</field>
+    <record model="ir.actions.act_window" id="gestion_tareas_sme.action_tareas">
+      <field name="name">tareas</field>
       <field name="res_model">gestion_tareas_sme.gestion_tareas_sme</field>
       <field name="view_mode">list,form</field>
     </record>
+       <!-- actions opening views on models -->
 
+    <record model="ir.actions.act_window" id="gestion_tareas_sme.action_sprints">
+      <field name="name">sprints</field>
+      <field name="res_model">gestion_tareas_sme.sprints_sme</field>
+      <field name="view_mode">list,form</field>
+    </record>
 
+    
 
     <!-- Top menu item -->
 
@@ -31,13 +60,10 @@
     <!-- menu categories -->
 
     <menuitem name="tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root"/>
-
-  
-
     <!-- actions -->
 
-    <menuitem name="List" id="gestion_tareas_sme.tareas_list" parent="gestion_tareas_sme.tareas"
-              action="gestion_tareas_sme.action_window"/>
+      <menuitem name="List" id="gestion_tareas_sme.menu_list" parent="gestion_tareas_sme.tareas" action="gestion_tareas_sme.action_tareas"/>
+      <menuitem name="form" id="gestion_tareas_sme.menu_form" parent="gestion_tareas_sme.tareas" action="gestion_tareas_sme.action_sprints"/>
 
   </data>
 </odoo>

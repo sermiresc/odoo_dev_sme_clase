@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_gestion_tareas_sme_gestion_tareas_sme,gestion_tareas_sme.gestion_tareas_sme,model_gestion_tareas_sme_gestion_tareas_sme,base.group_user,1,1,1,1
+access_gestion_tareas_sme_sprints_sme,acceso_sprints_sme,model_gestion_tareas_sme_sprints_sme,base.group_user,1,1,1,1
