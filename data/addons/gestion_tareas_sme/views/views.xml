@@ -6,12 +6,12 @@
       <field name="model">gestion_tareas_sme.gestion_tareas_sme</field>
       <field name="arch" type="xml">
         <list>
-            <field name="nombre"/>
-            <field name="descripcion"/>
-            <field name="fecha_creacion"/>
-            <field name="fecha_ini"/>
-            <field name="fecha_fin"/>
-            <field name="finalizado"/>
+            <field name="name"/>
+            <field name="description"/>
+            <field name="date_creacion"/>
+            <field name="date_ini"/>
+            <field name="date_fin"/>
+            <field name="ended"/>
             <field name="sprint"/>
         </list>
       </field>
@@ -59,11 +59,12 @@
 
     <!-- menu categories -->
 
-    <menuitem name="tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root"/>
-    <!-- actions -->
+    <menuitem name="tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_tareas"/>
+    <menuitem name="sprints" id="gestion_tareas_sme.sprints" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_sprints"/>
+    
 
-      <menuitem name="List" id="gestion_tareas_sme.menu_list" parent="gestion_tareas_sme.tareas" action="gestion_tareas_sme.action_tareas"/>
-      <menuitem name="form" id="gestion_tareas_sme.menu_form" parent="gestion_tareas_sme.tareas" action="gestion_tareas_sme.action_sprints"/>
+      
+      
 
   </data>
 </odoo>
