@@ -13,8 +13,8 @@ Una vez hecho el clonado **antes de restauar la base de datos** deben efectuarse
   - En la línea 19, poner el mismo valor que en el fichero anterior en `postgres_dev_dam`
 - `script/restore.sh` y `script/backup.sh`: actualizar las siguientes variables que se encuentran al principio de los scripts: 
   ```bash
-  PG_CONTAINER="postgres_dev_sergim"   # Nombre del contenedor de Postgres
-  ODOO_CONTAINER="odoo_dev_sergim"     # Nombre del contenedor de Odoo
+  PG_CONTAINER="postgres_dev_sme_clase"   # Nombre del contenedor de Postgres
+  ODOO_CONTAINER="odoo_dev_sme_clase"     # Nombre del contenedor de Odoo
   PG_USER="odoo"                    # Usuario de la BD Postgres
   DB_NAME="odoo"                    # Nombre de la BD a respaldar 
   ```
