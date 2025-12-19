@@ -1,24 +1,64 @@
 <odoo>
   <data>
  <!-- Vista de Lista -->
-    <record model="ir.ui.view" id="gestion_tareas_sme.list">
+    <record model="ir.ui.view" id="tareas_list">
       <field name="name">gestion_tareas_sme list</field>
       <field name="model">gestion_tareas_sme.gestion_tareas_sme</field>
       <field name="arch" type="xml">
         <list>
+            <field name="codigo"/>
             <field name="name"/>
             <field name="description"/>
             <field name="date_creacion"/>
-            <field name="date_ini"/>
-            <field name="date_fin"/>
+            <field name="fecha_ini"/>
+            <field name="fecha_fin"/>
             <field name="ended"/>
             <field name="sprint"/>
         </list>
       </field>
     </record>
 
+
+
+    <!-- Vista de Formulario -->
+    <record model="ir.ui.view" id="tareas_form">
+      <field name="name">gestion_tareas_sme tareas_form</field>
+      <field name="model">gestion_tareas_sme.gestion_tareas_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="codigo"/>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="date_creacion"/>
+                    <field name="fecha_ini"/>
+                    <field name="fecha_fin"/>
+                    <field name="ended"/>
+                    <field name="sprint"/>
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+
+
+<!-- Vista de Lista -->
+    <record model="ir.ui.view" id="sprint_list">
+      <field name="name">gestion_tareas_sme list</field>
+      <field name="model">gestion_tareas_sme.sprints_sme</field>
+      <field name="arch" type="xml">
+        <list>
+            
+            <field name="name"/>
+            <field name="description"/>
+        </list>
+      </field>
+    </record>
+
 <!-- Vista de Formulario -->
-    <record model="ir.ui.view" id="gestion_tareas_sme.form">
+    <record model="ir.ui.view" id="sprint_form">
       <field name="name">gestion_tareas_sme form</field>
       <field name="model">gestion_tareas_sme.sprints_sme</field>
       <field name="arch" type="xml">
@@ -27,8 +67,9 @@
                 <group>
                     <field name="name"/>
                     <field name="description"/>
-                    <field name="date_ini"/>
-                    <field name="date_fin"/>
+                    <field name="fecha_ini"/>
+                    <field name="duracion"/>
+                    <field name="fecha_fin"/>
                     <field name="tasks"/>
                 </group>
             </sheet>
@@ -62,9 +103,6 @@
     <menuitem name="tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_tareas"/>
     <menuitem name="sprints" id="gestion_tareas_sme.sprints" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_sprints"/>
     
-
-      
-      
 
   </data>
 </odoo>

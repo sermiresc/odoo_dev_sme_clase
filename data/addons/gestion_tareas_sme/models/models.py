@@ -1,9 +1,16 @@
 from odoo import models, fields, api
+from datetime import timedelta
 
 
 class gestion_tareas_sme(models.Model):
     _name = 'gestion_tareas_sme.gestion_tareas_sme'
     _description = 'gestion_tareas_sme.gestion_tareas_sme'
+
+
+    # En el modelo tareas_sergio
+
+
+    codigo = fields.Char(compute="_get_codigo")
 
     name = fields.Char(
         string="Nombre", 
@@ -19,12 +26,12 @@ class gestion_tareas_sme(models.Model):
         required=True, 
         help="Fecha en la que se dio de alta la tarea")
 
-    date_ini = fields.Datetime(
+    fecha_ini = fields.Datetime(
         string="Fecha Inicio", 
         required=True, 
         help="Fecha y hora de inicio de la tarea")
 
-    date_fin = fields.Datetime(
+    fecha_fin = fields.Datetime(
         string="Fecha Final", 
         help="Fecha y hora de finalización de la tarea")
 
@@ -45,6 +52,15 @@ class gestion_tareas_sme(models.Model):
         column2='rel_tecnologias',
         string='Tecnologías')
 
+    def _get_codigo(self):
+        for tarea in self:
+            # Si la tarea no tiene un sprint asignado
+            if not tarea.sprint:
+                tarea.codigo = "TSK_" + str(tarea.id)
+            else:
+                # Si tiene sprint, usamos su nombre
+                tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+
 class sprints_sme(models.Model):
     _name = 'gestion_tareas_sme.sprints_sme'
     _description = 'Modelo de Sprints para Gestión de Proyectos'
@@ -58,20 +74,31 @@ class sprints_sme(models.Model):
         string="Descripción", 
         help="Breve descripción del sprint")
 
-    date_ini = fields.Datetime(
+    fecha_ini = fields.Datetime(
         string="Fecha Inicio", 
         required=True, 
         help="Fecha y hora de inicio del sprint")
-
-    date_fin = fields.Datetime(
-        string="Fecha Final", 
-        help="Fecha y hora de finalización del sprint")
 
     tasks = fields.One2many(
         'gestion_tareas_sme.gestion_tareas_sme', 
         'sprint', 
         string='Tareas del Sprint')
+    duracion = fields.Integer(
+        string="Duración", 
+        help="Cantidad de días que tiene asignado el sprint")
 
+    fecha_fin = fields.Datetime(
+        compute='_compute_fecha_fin', 
+        store=True,
+        string="Fecha Fin")
+
+    @api.depends('fecha_ini', 'duracion')
+    def _compute_fecha_fin(self):
+        for sprint in self:
+            if sprint.fecha_ini and sprint.duracion and sprint.duracion > 0:
+                sprint.fecha_fin = sprint.fecha_ini + timedelta(days=sprint.duracion)
+            else:
+                sprint.fecha_fin = sprint.fecha_ini
 class tecnologias_sme(models.Model):
     _name = 'gestion_tareas_sme.tecnologias_sme'
     _description = 'Modelo de Tecnologías'
