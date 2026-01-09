@@ -1,6 +1,9 @@
 from odoo import models, fields, api
 from datetime import timedelta
+from odoo.exceptions import ValidationError
+import logging
 
+_logger = logging.getLogger(__name__)
 
 class gestion_tareas_sme(models.Model):
     _name = 'gestion_tareas_sme.gestion_tareas_sme'
@@ -54,12 +57,16 @@ class gestion_tareas_sme(models.Model):
 
     def _get_codigo(self):
         for tarea in self:
-            # Si la tarea no tiene un sprint asignado
-            if not tarea.sprint:
-                tarea.codigo = "TSK_" + str(tarea.id)
-            else:
-                # Si tiene sprint, usamos su nombre
+            try:
+                # Verificamos que tenga sprint asignado
+                if not tarea.sprint:
+                    _logger.warning(f"Tarea {tarea.id} sin sprint asignado")
+
+                # Generamos el código
                 tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+
+            except Exception as e:
+                raise ValidationError(f"Error al generar el código: {str(e)}")
 
 class sprints_sme(models.Model):
     _name = 'gestion_tareas_sme.sprints_sme'
@@ -95,10 +102,22 @@ class sprints_sme(models.Model):
     @api.depends('fecha_ini', 'duracion')
     def _compute_fecha_fin(self):
         for sprint in self:
-            if sprint.fecha_ini and sprint.duracion and sprint.duracion > 0:
-                sprint.fecha_fin = sprint.fecha_ini + timedelta(days=sprint.duracion)
-            else:
-                sprint.fecha_fin = sprint.fecha_ini
+            try:
+                if sprint.fecha_ini and sprint.duracion and sprint.duracion > 0:
+                    sprint.fecha_fin = sprint.fecha_ini + timedelta(days=sprint.duracion)
+                else:
+                    sprint.fecha_fin = sprint.fecha_ini
+            except Exception as e:
+                raise UserError(f"Error al generar el codigo: {str(e)}")
+
+    @api.constrains('fecha_ini', 'fecha_fin')
+    def _check_fechas(self):
+        for sprint in self:
+            if sprint.fecha_fin and sprint.fecha_ini:
+                if sprint.fecha_fin < sprint.fecha_ini:
+                    raise ValidationError(
+                        "La fecha de fin no puede ser anterior a la fecha de inicio."
+                    )
 class tecnologias_sme(models.Model):
     _name = 'gestion_tareas_sme.tecnologias_sme'
     _description = 'Modelo de Tecnologías'
