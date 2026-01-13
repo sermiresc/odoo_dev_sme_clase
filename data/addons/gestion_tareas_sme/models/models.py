@@ -1,17 +1,70 @@
 from odoo import models, fields, api
-from datetime import timedelta
+from datetime import datetime, timedelta
 from odoo.exceptions import ValidationError
 import logging
 
 _logger = logging.getLogger(__name__)
 
+# HISTORIAS DE USUARIO ********************************************
+class historias_sme(models.Model):
+    _name = 'gestion_tareas_sme.historias_sme'
+    _description = 'gestion_tareas_sme.historias_sme'
+
+
+    name = fields.Char(
+        string="Nombre", 
+        required=True, 
+        help="Nombre de la historia")
+
+    description = fields.Text(
+        string="Descripción", 
+        help="Breve descripción de la historia")
+
+    proyecto = fields.Many2one(
+        'gestion_tareas_sme.proyectos_sme', 
+        string='Proyecto', 
+        ondelete='set null', 
+        help='Proyecto al que pertenece esta tarea')
+
+    tareas = fields.One2many(
+        'gestion_tareas_sme.gestion_tareas_sme', 
+        'historia', 
+        string='tareas de la historia')
+
+
+# TAREAS_SERGI ***************************************************
+class proyectos_sme(models.Model):
+    _name = 'gestion_tareas_sme.proyectos_sme'
+    _description = 'gestion_tareas_sme.proyectos_sme'
+
+
+    name = fields.Char(
+        string="Nombre", 
+        required=True, 
+        help="Introduzca el nombre del proyecto")
+
+    description = fields.Text(
+        string="Descripción", 
+        help="Breve descripción del proyecto")
+
+    historias = fields.One2many(
+        'gestion_tareas_sme.historias_sme', 
+        'proyecto', 
+        string='historias de usuario del proyecto')
+
+    sprints = fields.One2many(
+        'gestion_tareas_sme.sprints_sme',
+        'proyecto',
+        string='Sprint de los proyectos')
+
+    
+
+# TAREAS_SERGI ***************************************************
 class gestion_tareas_sme(models.Model):
     _name = 'gestion_tareas_sme.gestion_tareas_sme'
     _description = 'gestion_tareas_sme.gestion_tareas_sme'
 
-
-    # En el modelo tareas_sergio
-
+    # ATRIBUTOS TAREAS *******************************************
 
     codigo = fields.Char(compute="_get_codigo")
 
@@ -42,11 +95,17 @@ class gestion_tareas_sme(models.Model):
         string="Finalizado", 
         help="Indica si la tarea ha sido finalizada o no")
 
+#    sprint = fields.Many2one(
+#       'gestion_tareas_sme.sprints_sme', 
+#       string='Sprint relacionado', 
+#       ondelete='set null', 
+#       help='Sprint al que pertenece esta tarea')
+
     sprint = fields.Many2one(
         'gestion_tareas_sme.sprints_sme', 
-        string='Sprint relacionado', 
-        ondelete='set null', 
-        help='Sprint al que pertenece esta tarea')
+        string='Sprint Activo', 
+        compute='_compute_sprint', 
+        store=True) 
 
     rel_tecnologias = fields.Many2many(
         comodel_name='gestion_tareas_sme.tecnologias_sme',
@@ -55,23 +114,64 @@ class gestion_tareas_sme(models.Model):
         column2='rel_tecnologias',
         string='Tecnologías')
 
+    historia = fields.Many2one(
+        'gestion_tareas_sme.historias_sme', 
+        string='historia de usuario', 
+        ondelete='set null', 
+        help='Historias de usuario de la tarea')
+
+    # METODOS TAREAS *******************************************
+
+
+    @api.depends('historia', 'historia.proyecto')
+    def _compute_sprint(self):
+        for tarea in self:
+            tarea.sprint = False
+
+            # Verificar que la tarea tiene historia y proyecto
+            if tarea.historia and tarea.historia.proyecto:
+                # Buscar sprints del proyecto
+                sprints = self.env['gestion_tareas_sme.sprints_sme'].search([
+                    ('proyecto.id', '=', tarea.historia.proyecto.id)
+                ])
+
+                # Buscar el sprint activo (fecha_fin > ahora) 
+                # de entre todos los sprints asociados al proyecto
+                # en teoría solo hay un sprint activo, por eso es el que no ha vencido
+                for sprint in sprints:
+                    if (isinstance(sprint.fecha_fin, datetime) and 
+                            sprint.fecha_ini <= datetime.now() and   
+                            sprint.fecha_fin > datetime.now()):
+                        tarea.sprint = sprint.id
+                        break
+
+
+
+    @api.depends('sprint', 'sprint.name')
     def _get_codigo(self):
         for tarea in self:
             try:
                 # Verificamos que tenga sprint asignado
                 if not tarea.sprint:
                     _logger.warning(f"Tarea {tarea.id} sin sprint asignado")
-
-                # Generamos el código
-                tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+                    tarea.codigo = "TSK_"+str(tarea.id)
+                else:
+                    # Generamos el código
+                    tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+                    
+                _logger.debug(f"Codigo generado: {tarea.codigo}")
 
             except Exception as e:
+                _logger.error(f"Error generando codigo para tarea {tarea.id}: {str(e)}")
                 raise ValidationError(f"Error al generar el código: {str(e)}")
 
+
+# SPRINTS_SERGI ************************************************
 class sprints_sme(models.Model):
     _name = 'gestion_tareas_sme.sprints_sme'
     _description = 'Modelo de Sprints para Gestión de Proyectos'
 
+    #ATRIBUTOS SPRINTS *****************************************
     name = fields.Char(
         string="Nombre", 
         required=True, 
@@ -99,6 +199,15 @@ class sprints_sme(models.Model):
         store=True,
         string="Fecha Fin")
 
+    proyecto = fields.Many2one(
+        'gestion_tareas_sme.proyectos_sme',
+        string='Proyecto',
+        ondelete='set null',
+        help='Proyecto de los sprints'
+    )
+
+    # METODOS SPRINTS ***************************************
+
     @api.depends('fecha_ini', 'duracion')
     def _compute_fecha_fin(self):
         for sprint in self:
@@ -118,9 +227,14 @@ class sprints_sme(models.Model):
                     raise ValidationError(
                         "La fecha de fin no puede ser anterior a la fecha de inicio."
                     )
+
+
+# TECNOLOGIAS_SERGI *******************************************
 class tecnologias_sme(models.Model):
     _name = 'gestion_tareas_sme.tecnologias_sme'
     _description = 'Modelo de Tecnologías'
+
+    # ATRIBUTOS TECNOLOGIAS ***********************************
 
     name = fields.Char(
         string="Nombre", 
@@ -144,6 +258,7 @@ class tecnologias_sme(models.Model):
         column2='rel_tareas',
         string='Tareas')
 
-        
+
+
 
 

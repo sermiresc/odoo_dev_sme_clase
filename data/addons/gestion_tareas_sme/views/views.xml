@@ -36,6 +36,8 @@
                     <field name="fecha_fin"/>
                     <field name="ended"/>
                     <field name="sprint"/>
+                    <field name="historia"/>
+
                 </group>
             </sheet>
         </form>
@@ -53,6 +55,7 @@
             
             <field name="name"/>
             <field name="description"/>
+            <field name="proyecto"/>
         </list>
       </field>
     </record>
@@ -71,6 +74,77 @@
                     <field name="duracion"/>
                     <field name="fecha_fin"/>
                     <field name="tasks"/>
+                    <field name="proyecto"/>
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+
+    <!-- Vista de Lista -->
+    <record model="ir.ui.view" id="historias_list">
+      <field name="name">gestion_tareas_sme list</field>
+      <field name="model">gestion_tareas_sme.historias_sme</field>
+      <field name="arch" type="xml">
+        <list>
+            <field name="name"/>
+            <field name="description"/>
+            
+        </list>
+      </field>
+    </record>
+
+
+
+    <!-- Vista de Formulario -->
+    <record model="ir.ui.view" id="historias_form">
+      <field name="name">gestion_tareas_sme form</field>
+      <field name="model">gestion_tareas_sme.historias_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="proyecto"/>
+                    <field name="tareas"/>
+                    
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+
+
+    <!-- Vista de Lista -->
+    <record model="ir.ui.view" id="proyectos_list">
+      <field name="name">gestion_tareas_sme list</field>
+      <field name="model">gestion_tareas_sme.proyectos_sme</field>
+      <field name="arch" type="xml">
+        <list>
+            <field name="name"/>
+            <field name="description"/>
+            
+        </list>
+      </field>
+    </record>
+
+
+    <!-- Vista de Formulario -->
+    <record model="ir.ui.view" id="proyectos_form">
+      <field name="name">gestion_tareas_sme form</field>
+      <field name="model">gestion_tareas_sme.proyectos_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="historias"/>
+                    <field name="sprints"/>
+                    
                 </group>
             </sheet>
         </form>
@@ -92,6 +166,18 @@
       <field name="view_mode">list,form</field>
     </record>
 
+    <record model="ir.actions.act_window" id="gestion_tareas_sme.action_historias">
+      <field name="name">historias</field>
+      <field name="res_model">gestion_tareas_sme.historias_sme</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="gestion_tareas_sme.action_proyectos">
+      <field name="name">proyectos</field>
+      <field name="res_model">gestion_tareas_sme.proyectos_sme</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
     
 
     <!-- Top menu item -->
@@ -99,9 +185,12 @@
     <menuitem name="gestion_tareas_sme" id="gestion_tareas_sme.menu_root"/>
 
     <!-- menu categories -->
-
-    <menuitem name="tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_tareas"/>
-    <menuitem name="sprints" id="gestion_tareas_sme.sprints" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_sprints"/>
+    <menuitem name="Proyectos" id="gestion_tareas_sme.proyectos" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_proyectos" sequence='10'/>
+    <menuitem name="Historias" id="gestion_tareas_sme.historias" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_historias" sequence='20'/>
+    <menuitem name="Tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_tareas" sequence='30'/>
+    <menuitem name="Sprints" id="gestion_tareas_sme.sprints" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_sprints" sequence='40'/>
+    
+    
     
 
   </data>
