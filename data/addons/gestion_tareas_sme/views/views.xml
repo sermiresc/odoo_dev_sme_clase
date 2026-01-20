@@ -36,7 +36,11 @@
                     <field name="fecha_fin"/>
                     <field name="ended"/>
                     <field name="sprint"/>
+                    <field name="rel_tecnologias"/>
                     <field name="historia"/>
+                    <field name="proyecto"/>
+                    <field name="responsable"/>
+                    <field name="proyecto_default"/>
 
                 </group>
             </sheet>
@@ -109,6 +113,8 @@
                     <field name="description"/>
                     <field name="proyecto"/>
                     <field name="tareas"/>
+                    <field name="tecnologias"/>
+
                     
                 </group>
             </sheet>

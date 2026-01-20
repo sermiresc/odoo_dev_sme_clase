@@ -9,7 +9,7 @@
         <list>
           <field name="codigo"/>
           <field name="name"/>
-          <field name="categoria"/>
+          <field name="categoria_id"/>
           <field name="precio"/>
           <field name="disponible"/>
           <field name="precio_con_iva"/>
@@ -32,7 +32,10 @@
                     <field name="descuento"/>
                     <field name="tiempo_preparacion"/>
                     <field name="disponible"/>
-                    <field name="categoria"/>
+                    <field name="fecha_alta"/>
+                    <field name="categoria_id"/>
+                    <field name="chef_especializado"/>
+                    <field name="especialidad_chef"/>
                     <field name="menu"/>
                     <field name="rel_ingredientes" widget="many2many_tags"/>
                 </group>
@@ -67,6 +70,99 @@
                     <field name="activo"/>
                     <field name="platos"/>  
                     <field name="precio_total"/>
+                    <field name="creado_por"/>
+                    <field name="dias_disponible"/>
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+
+
+    <record model="ir.ui.view" id="gestion_restaurante_sme.list_ingrediente">
+      <field name="name">gestion_restaurante_sme list_ingrediente</field>
+      <field name="model">gestion_restaurante_sme.ingrediente_sme</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="description"/>          
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="gestion_restaurante_sme.form_ingredientes">
+      <field name="name">gestion_restaurante_sme form_ingredientes</field>
+      <field name="model">gestion_restaurante_sme.ingrediente_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="es_alergeno"/>
+                    <field name="description"/>                    
+                    <field name="rel_platos"/>
+                    
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="gestion_restaurante_sme.list_categoria">
+      <field name="name">gestion_restaurante_sme list_categoria</field>
+      <field name="model">gestion_restaurante_sme.categorias_sme</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="description"/>          
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="gestion_restaurante_sme.form_categorias">
+      <field name="name">gestion_restaurante_sme form_categorias</field>
+      <field name="model">gestion_restaurante_sme.categorias_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>              
+                    <field name="description"/>                    
+                    <field name="platos"/>
+                    <field name="chefs"/>
+                    <field name="ingredientes_comunes"/>
+
+                    
+                </group>
+            </sheet>
+        </form>
+      </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="gestion_restaurante_sme.list_chef">
+      <field name="name">gestion_restaurante_sme list_chef</field>
+      <field name="model">gestion_restaurante_sme.chef_sme</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>            
+        </list>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="gestion_restaurante_sme.form_chef">
+      <field name="name">gestion_restaurante_sme form_chef</field>
+      <field name="model">gestion_restaurante_sme.chef_sme</field>
+      <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>              
+                    <field name="especialidad"/>                    
+                    <field name="platos_asignados"/>
+                    
                 </group>
             </sheet>
         </form>
@@ -88,6 +184,25 @@
       <field name="view_mode">list,form</field>
     </record>
 
+    <record model="ir.actions.act_window" id="gestion_restaurante_sme.action_ingredientes_window">
+      <field name="name">gestion_restaurante_sme ingrediente_window</field>
+      <field name="res_model">gestion_restaurante_sme.ingrediente_sme</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="gestion_restaurante_sme.action_categorias_window">
+      <field name="name">gestion_restaurante_sme categoria_window</field>
+      <field name="res_model">gestion_restaurante_sme.categorias_sme</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+
+    <record model="ir.actions.act_window" id="gestion_restaurante_sme.action_chefs_window">
+      <field name="name">gestion_restaurante_sme chef_window</field>
+      <field name="res_model">gestion_restaurante_sme.chef_sme</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
 
     <!-- Top menu item -->
 
@@ -95,7 +210,7 @@
 
     <!-- menu categories -->
 
-    <menuitem name="Menus y platos" id="gestion_restaurante_sme.menu" parent="gestion_restaurante_sme.menu_root"/>
+    <menuitem name="Menu" id="gestion_restaurante_sme.menu" parent="gestion_restaurante_sme.menu_root"/>
 
     <!-- actions -->
 
@@ -104,6 +219,16 @@
 
     <menuitem name="Listados Menus" id="gestion_restaurante_sme.menu_listado_menus" parent="gestion_restaurante_sme.menu"
               action="gestion_restaurante_sme.action_menus_window"/>
+
+            
+    <menuitem name="Listado ingredientes" id="gestion_restaurante_sme.menu_listado_ingredientes" parent="gestion_restaurante_sme.menu"
+              action="gestion_restaurante_sme.action_ingredientes_window"/>
+
+    <menuitem name="Listado categorias" id="gestion_restaurante_sme.menu_listado_categorias" parent="gestion_restaurante_sme.menu"
+              action="gestion_restaurante_sme.action_categorias_window"/>
+
+    <menuitem name="Listado chefs" id="gestion_restaurante_sme.menu_listado_chefs" parent="gestion_restaurante_sme.menu"
+              action="gestion_restaurante_sme.action_chefs_window"/>
 
   </data>
 </odoo>

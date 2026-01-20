@@ -31,6 +31,25 @@ class historias_sme(models.Model):
         'historia', 
         string='tareas de la historia')
 
+    tecnologias = fields.Many2many(
+        "gestion_tareas_sme.tecnologias_sme",
+        compute="_compute_tecnologias",
+        string="Tecnologias Utilizadas"
+    )
+
+    @api.depends('tareas', 'tareas.rel_tecnologias')
+    def _compute_tecnologias(self):
+        for historia in self:
+            tecnologias_acumuladas = self.env['gestion_tareas_sme.tecnologias_sme']
+
+            for tarea in historia.tareas:
+                tecnologias_acumuladas = tecnologias_acumuladas + tarea.rel_tecnologias
+            
+            
+            historia.tecnologias = tecnologias_acumuladas
+
+    
+
 
 # TAREAS_SERGI ***************************************************
 class proyectos_sme(models.Model):
@@ -46,6 +65,11 @@ class proyectos_sme(models.Model):
     description = fields.Text(
         string="Descripción", 
         help="Breve descripción del proyecto")
+    
+    activo = fields.Boolean(
+        string='Estado del proyecto',
+        default= True
+    )
 
     historias = fields.One2many(
         'gestion_tareas_sme.historias_sme', 
@@ -56,6 +80,8 @@ class proyectos_sme(models.Model):
         'gestion_tareas_sme.sprints_sme',
         'proyecto',
         string='Sprint de los proyectos')
+
+    
 
     
 
@@ -77,10 +103,14 @@ class gestion_tareas_sme(models.Model):
         string="Descripción", 
         help="Breve descripción de la tarea")
 
+    # def _get_date_actual(self):
+    #     return datetime.now()
+
     date_creacion = fields.Date(
         string="Fecha Creación", 
         required=True, 
-        help="Fecha en la que se dio de alta la tarea")
+        help="Fecha en la que se dio de alta la tarea",
+        default=lambda self: datetime.now())
 
     fecha_ini = fields.Datetime(
         string="Fecha Inicio", 
@@ -120,6 +150,33 @@ class gestion_tareas_sme(models.Model):
         ondelete='set null', 
         help='Historias de usuario de la tarea')
 
+    
+
+    proyecto = fields.Many2one(
+        'gestion_tareas_sme.proyectos_sme',
+        string='proyecto de usuario',
+        ondelete="set null",
+        help='Proyecto de los usuario',
+        related="historia.proyecto",
+        readonly=True
+    )
+
+    def _get_proyecto_activo(self):
+        return self.env['gestion_tareas_sme.proyectos_sme'].search(
+            [('activo','=',True)],
+            limit=1, order='create_date desc')
+            
+    proyecto_default = fields.Many2one(
+        'gestion_tareas_sme.proyectos_sme',
+        string='proyecto default',
+        default=_get_proyecto_activo
+    )
+
+    responsable = fields.Many2one(
+        'res.users',
+        string='Responsable',
+        default=lambda self: self.env.user.id)
+
     # METODOS TAREAS *******************************************
 
 
@@ -157,7 +214,7 @@ class gestion_tareas_sme(models.Model):
                     tarea.codigo = "TSK_"+str(tarea.id)
                 else:
                     # Generamos el código
-                    tarea.codigo = str(tarea.sprint.name).upper() + "_" + str(tarea.id)
+                    tarea.codigo = str(tarea.sprint.name[:3]).upper() + "_" + str(tarea.id)
                     
                 _logger.debug(f"Codigo generado: {tarea.codigo}")
 
@@ -191,7 +248,8 @@ class sprints_sme(models.Model):
         'sprint', 
         string='Tareas del Sprint')
     duracion = fields.Integer(
-        string="Duración", 
+        string="Duración (dias)", 
+        default=14,
         help="Cantidad de días que tiene asignado el sprint")
 
     fecha_fin = fields.Datetime(
