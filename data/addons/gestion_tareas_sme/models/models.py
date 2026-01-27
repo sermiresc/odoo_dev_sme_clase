@@ -177,6 +177,13 @@ class gestion_tareas_sme(models.Model):
         string='Responsable',
         default=lambda self: self.env.user.id)
 
+
+    desarrollador_ids = fields.Many2one(
+        'res.partner',
+        string='Desarrollador',
+        help='Desarrollador asignado a la tarea'
+    )
+
     # METODOS TAREAS *******************************************
 
 
@@ -263,6 +270,7 @@ class sprints_sme(models.Model):
         ondelete='set null',
         help='Proyecto de los sprints'
     )
+    
 
     # METODOS SPRINTS ***************************************
 
@@ -315,6 +323,49 @@ class tecnologias_sme(models.Model):
         column1='rel_tecnologias',
         column2='rel_tareas',
         string='Tareas')
+
+    desarrolladores_ids = fields.Many2many(
+        comodel_name='res.partner',
+        relation='rel_dev_tec',
+        column2='desarrollador_id',
+        column1='tecnologia_id',
+        string='Desarrolladores'
+    )
+        
+
+# TECNOLOGIAS_SERGI *******************************************
+class desarrolladores_sme(models.Model):
+    _name = 'res.partner'
+    _inherit = 'res.partner'
+
+    es_desarrollador = fields.Boolean(
+        string='Es desarrollador',
+        default=False
+    )
+
+    tecnologias_ids = fields.Many2many (
+        comodel_name='gestion_tareas_sme.tecnologias_sme',
+        relation='rel_dev_tec',
+        column1='desarrollador_id',
+        column2='tecnologia_id',
+        string='Tecnologias'
+    )
+
+
+    @api.onchange('es_desarrollador')
+    def _onchange_es_desarrollador(self):
+        # Buscar la categoría "Desarrollador"
+        categorias = self.env['res.partner.category'].search([('name', '=', 'Desarrollador')])
+
+        if len(categorias) > 0:
+            # Si existe, usar la primera encontrada
+            category = categorias[0]
+        else:
+            # Si no existe, crearla
+            category = self.env['res.partner.category'].create({'name': 'Desarrollador'})
+
+        # Asignar la categoría al contacto
+        self.category_id = [(4, category.id)]
 
 
 

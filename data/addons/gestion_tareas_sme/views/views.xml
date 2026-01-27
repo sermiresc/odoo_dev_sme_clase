@@ -36,12 +36,17 @@
                     <field name="fecha_fin"/>
                     <field name="ended"/>
                     <field name="sprint"/>
-                    <field name="rel_tecnologias"/>
+                    <field name="rel_tecnologias" widget='many2many_tags'/>
                     <field name="historia"/>
                     <field name="proyecto"/>
                     <field name="responsable"/>
+                    <field name="desarrollador_ids" 
+                          domain="[('es_desarrollador', '=', True)]"
+                          context="{
+                              'form_view_ref': 'gestion_tareas_sme.view_partner_form_inherit',
+                              'default_es_desarrollador': True
+                          }"/>
                     <field name="proyecto_default"/>
-
                 </group>
             </sheet>
         </form>
@@ -157,6 +162,48 @@
       </field>
     </record>
 
+    <!-- Vista de Lista -->
+    <record model="ir.ui.view" id="proyectos_list">
+      <field name="name">gestion_tareas_sme list</field>
+      <field name="model">gestion_tareas_sme.proyectos_sme</field>
+      <field name="arch" type="xml">
+        <list>
+            <field name="name"/>
+            <field name="description"/>
+            
+        </list>
+      </field>
+    </record>
+
+
+    <!-- Vista de Formulario -->
+    <record model="ir.ui.view" id="gestion_tareas_sme.view_partner_form_inherit">
+      <field name="name">desarrolladores form</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="mode">primary</field>
+      <field name="arch" type="xml">
+      <xpath expr="//field[@name='website']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+
+      <xpath expr="//page[@name='sales_purchases']" position="attributes">
+            <attribute name="invisible">1</attribute>
+      </xpath>
+        <xpath expr="//sheet/notebook/page[@name='internal_notes']" position="after">
+          <page name="devs" string='Datos Desarrollador' invisible="not es_desarrollador"> 
+            <sheet>
+                <group>
+                    <field name='es_desarrollador' readonly="1"/>
+                    <field name="tecnologias_ids" widget="many2many_tags"/>                      
+                </group>
+            </sheet>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+
    <!-- actions opening views on models -->
 
     <record model="ir.actions.act_window" id="gestion_tareas_sme.action_tareas">
@@ -184,6 +231,26 @@
       <field name="view_mode">list,form</field>
     </record>
 
+    <record model="ir.actions.act_window" id="gestion_tareas_sme.action_desarrolladores">
+      <field name="name">desarrolladores</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('es_desarrollador', '=', True)]</field>
+      <field name="context">{'default_es_desarrollador': True}</field>  
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_view_desarrolladores_list">
+      <field name="sequence" eval="1"/>
+      <field name="view_mode">list</field>
+      <field name="view_id" ref="base.view_partner_tree"/>
+      <field name="act_window_id" ref="gestion_tareas_sme.action_desarrolladores"/>
+    </record>
+    <record model="ir.actions.act_window.view" id="action_view_desarrolladores_form">
+      <field name="sequence" eval="1"/>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="gestion_tareas_sme.view_partner_form_inherit"/>
+      <field name="act_window_id" ref="gestion_tareas_sme.action_desarrolladores"/>
+    </record>
     
 
     <!-- Top menu item -->
@@ -195,6 +262,7 @@
     <menuitem name="Historias" id="gestion_tareas_sme.historias" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_historias" sequence='20'/>
     <menuitem name="Tareas" id="gestion_tareas_sme.tareas" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_tareas" sequence='30'/>
     <menuitem name="Sprints" id="gestion_tareas_sme.sprints" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_sprints" sequence='40'/>
+    <menuitem name="Desarrolladores" id="gestion_tareas_sme.desarrolladores" parent="gestion_tareas_sme.menu_root" action="gestion_tareas_sme.action_desarrolladores" sequence='50'/>
     
     
     

@@ -307,6 +307,16 @@ class menu_sme(models.Model):
         string='Creador',
         readonly=True,
         default=lambda self: self.env.user.id)
+
+
+    camarero_menu = fields.Many2many(
+        comodel_name="res.partner",
+        relation="relacion_camarero_menus",
+        column2="camarero_menu",
+        column1="menus_especialidad",
+        string="Camarero",
+        help="Camarero especializado en el menu"
+    )
     
     # METODOS MENUS ******************************************
 
@@ -382,6 +392,53 @@ class ingrediente_sme(models.Model):
     )
 
     
+class Camarero(models.Model):
+    _name = 'res.partner'
+    _inherit = 'res.partner'
+
+    es_camarero = fields.Boolean(
+        string='Camarero',
+        help='Indica si es camarero o no',
+        default=False
+    )
+
+    turno = fields.Selection([
+                            ('mañana', 'Mañana'),
+                            ('tarde', 'Tarde'),
+                            ('noche', 'Noche'),],
+                            string='turno')
+    seccion = fields.Char(
+        string="Seccion",
+        help='Zona asignada'
+    )
+
+    menus_especialidad = fields.Many2many(
+        comodel_name="gestion_restaurante_sme.menu_sme",
+        relation="relacion_camarero_menus",
+        column2="menus_especialidad",
+        column1="camarero_menu",
+        string="Menus",
+        help="Menus del camareror"
+
+    )
+
+
+    @api.onchange('es_camarero')
+    def _onchange_es_camarero(self):
+        # Buscar la categoría "Camarero"
+        categorias = self.env['res.partner.category'].search([('name', '=', 'Camarero')])
+
+        if len(categorias) > 0:
+            # Si existe, usar la primera encontrada
+            category = categorias[0]
+        else:
+            # Si no existe, crearla
+            category = self.env['res.partner.category'].create({'name': 'Camarero'})
+
+        # Asignar la categoría al contacto
+        self.category_id = [(4, category.id)]
+
+
 
 
     
